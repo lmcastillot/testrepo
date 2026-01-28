@@ -176,7 +176,7 @@ We should see that the request was successfull with the 200 status response code
 
 
 ```python
-response=requests.get(static_json_url)
+response=requests.get(static_json_url).json()
 ```
 
 
@@ -185,10 +185,15 @@ response.status_code
 ```
 
 
+    ---------------------------------------------------------------------------
 
+    AttributeError                            Traceback (most recent call last)
 
-    200
+    /tmp/ipykernel_68/160151258.py in <module>
+    ----> 1 response.status_code
+    
 
+    AttributeError: 'list' object has no attribute 'status_code'
 
 
 Now we decode the response content as a Json using <code>.json()</code> and turn it into a Pandas dataframe using <code>.json_normalize()</code>
@@ -197,43 +202,59 @@ Now we decode the response content as a Json using <code>.json()</code> and turn
 
 ```python
 # Use json_normalize meethod to convert the json result into a dataframe
-data = pd.read_json(static_json_url)
+data = pd.json_normalize(response)
 data.info()
 ```
 
     <class 'pandas.core.frame.DataFrame'>
     RangeIndex: 107 entries, 0 to 106
-    Data columns (total 26 columns):
-     #   Column                 Non-Null Count  Dtype  
-    ---  ------                 --------------  -----  
-     0   fairings               83 non-null     object 
-     1   links                  107 non-null    object 
-     2   static_fire_date_utc   100 non-null    object 
-     3   static_fire_date_unix  100 non-null    float64
-     4   tbd                    107 non-null    bool   
-     5   net                    107 non-null    bool   
-     6   window                 100 non-null    float64
-     7   rocket                 107 non-null    object 
-     8   success                107 non-null    bool   
-     9   details                100 non-null    object 
-     10  crew                   107 non-null    object 
-     11  ships                  107 non-null    object 
-     12  capsules               107 non-null    object 
-     13  payloads               107 non-null    object 
-     14  launchpad              107 non-null    object 
-     15  auto_update            107 non-null    bool   
-     16  failures               107 non-null    object 
-     17  flight_number          107 non-null    int64  
-     18  name                   107 non-null    object 
-     19  date_utc               107 non-null    object 
-     20  date_unix              107 non-null    int64  
-     21  date_local             107 non-null    object 
-     22  date_precision         107 non-null    object 
-     23  upcoming               107 non-null    bool   
-     24  cores                  107 non-null    object 
-     25  id                     107 non-null    object 
-    dtypes: bool(5), float64(2), int64(2), object(17)
-    memory usage: 18.2+ KB
+    Data columns (total 42 columns):
+     #   Column                     Non-Null Count  Dtype  
+    ---  ------                     --------------  -----  
+     0   static_fire_date_utc       100 non-null    object 
+     1   static_fire_date_unix      100 non-null    float64
+     2   tbd                        107 non-null    bool   
+     3   net                        107 non-null    bool   
+     4   window                     100 non-null    float64
+     5   rocket                     107 non-null    object 
+     6   success                    107 non-null    bool   
+     7   details                    100 non-null    object 
+     8   crew                       107 non-null    object 
+     9   ships                      107 non-null    object 
+     10  capsules                   107 non-null    object 
+     11  payloads                   107 non-null    object 
+     12  launchpad                  107 non-null    object 
+     13  auto_update                107 non-null    bool   
+     14  failures                   107 non-null    object 
+     15  flight_number              107 non-null    int64  
+     16  name                       107 non-null    object 
+     17  date_utc                   107 non-null    object 
+     18  date_unix                  107 non-null    int64  
+     19  date_local                 107 non-null    object 
+     20  date_precision             107 non-null    object 
+     21  upcoming                   107 non-null    bool   
+     22  cores                      107 non-null    object 
+     23  id                         107 non-null    object 
+     24  fairings.reused            74 non-null     object 
+     25  fairings.recovery_attempt  80 non-null     object 
+     26  fairings.recovered         71 non-null     object 
+     27  fairings.ships             83 non-null     object 
+     28  links.patch.small          107 non-null    object 
+     29  links.patch.large          107 non-null    object 
+     30  links.reddit.campaign      79 non-null     object 
+     31  links.reddit.launch        97 non-null     object 
+     32  links.reddit.media         83 non-null     object 
+     33  links.reddit.recovery      39 non-null     object 
+     34  links.flickr.small         107 non-null    object 
+     35  links.flickr.original      107 non-null    object 
+     36  links.presskit             90 non-null     object 
+     37  links.webcast              107 non-null    object 
+     38  links.youtube_id           107 non-null    object 
+     39  links.article              104 non-null    object 
+     40  links.wikipedia            106 non-null    object 
+     41  fairings                   0 non-null      float64
+    dtypes: bool(5), float64(3), int64(2), object(32)
+    memory usage: 31.6+ KB
 
 
 Using the dataframe <code>data</code> print the first 5 rows
@@ -266,8 +287,6 @@ data.head(5)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>fairings</th>
-      <th>links</th>
       <th>static_fire_date_utc</th>
       <th>static_fire_date_unix</th>
       <th>tbd</th>
@@ -292,13 +311,29 @@ data.head(5)
       <th>upcoming</th>
       <th>cores</th>
       <th>id</th>
+      <th>fairings.reused</th>
+      <th>fairings.recovery_attempt</th>
+      <th>fairings.recovered</th>
+      <th>fairings.ships</th>
+      <th>links.patch.small</th>
+      <th>links.patch.large</th>
+      <th>links.reddit.campaign</th>
+      <th>links.reddit.launch</th>
+      <th>links.reddit.media</th>
+      <th>links.reddit.recovery</th>
+      <th>links.flickr.small</th>
+      <th>links.flickr.original</th>
+      <th>links.presskit</th>
+      <th>links.webcast</th>
+      <th>links.youtube_id</th>
+      <th>links.article</th>
+      <th>links.wikipedia</th>
+      <th>fairings</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>{'reused': False, 'recovery_attempt': False, 'recovered': False, 'ships': []}</td>
-      <td>{'patch': {'small': 'https://images2.imgbox.com/3c/0e/T8iJcSN3_o.png', 'large': 'https://images2.imgbox.com/40/e3/GypSkayF_o.png'}, 'reddit': {'campaign': None, 'launch': None, 'media': None, 'recovery': None}, 'flickr': {'small': [], 'original': []}, 'presskit': None, 'webcast': 'https://www.youtube.com/watch?v=0a_00nJ_Y88', 'youtube_id': '0a_00nJ_Y88', 'article': 'https://www.space.com/2196-spacex-inaugural-falcon-1-rocket-lost-launch.html', 'wikipedia': 'https://en.wikipedia.org/wiki/DemoSat'}</td>
       <td>2006-03-17T00:00:00.000Z</td>
       <td>1.142554e+09</td>
       <td>False</td>
@@ -323,11 +358,27 @@ data.head(5)
       <td>False</td>
       <td>[{'core': '5e9e289df35918033d3b2623', 'flight': 1, 'gridfins': False, 'legs': False, 'reused': False, 'landing_attempt': False, 'landing_success': None, 'landing_type': None, 'landpad': None}]</td>
       <td>5eb87cd9ffd86e000604b32a</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>[]</td>
+      <td>https://images2.imgbox.com/3c/0e/T8iJcSN3_o.png</td>
+      <td>https://images2.imgbox.com/40/e3/GypSkayF_o.png</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>[]</td>
+      <td>[]</td>
+      <td>None</td>
+      <td>https://www.youtube.com/watch?v=0a_00nJ_Y88</td>
+      <td>0a_00nJ_Y88</td>
+      <td>https://www.space.com/2196-spacex-inaugural-falcon-1-rocket-lost-launch.html</td>
+      <td>https://en.wikipedia.org/wiki/DemoSat</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>{'reused': False, 'recovery_attempt': False, 'recovered': False, 'ships': []}</td>
-      <td>{'patch': {'small': 'https://images2.imgbox.com/4f/e3/I0lkuJ2e_o.png', 'large': 'https://images2.imgbox.com/be/e7/iNqsqVYM_o.png'}, 'reddit': {'campaign': None, 'launch': None, 'media': None, 'recovery': None}, 'flickr': {'small': [], 'original': []}, 'presskit': None, 'webcast': 'https://www.youtube.com/watch?v=Lk4zQ2wP-Nc', 'youtube_id': 'Lk4zQ2wP-Nc', 'article': 'https://www.space.com/3590-spacex-falcon-1-rocket-fails-reach-orbit.html', 'wikipedia': 'https://en.wikipedia.org/wiki/DemoSat'}</td>
       <td>None</td>
       <td>NaN</td>
       <td>False</td>
@@ -352,11 +403,27 @@ data.head(5)
       <td>False</td>
       <td>[{'core': '5e9e289ef35918416a3b2624', 'flight': 1, 'gridfins': False, 'legs': False, 'reused': False, 'landing_attempt': False, 'landing_success': None, 'landing_type': None, 'landpad': None}]</td>
       <td>5eb87cdaffd86e000604b32b</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>[]</td>
+      <td>https://images2.imgbox.com/4f/e3/I0lkuJ2e_o.png</td>
+      <td>https://images2.imgbox.com/be/e7/iNqsqVYM_o.png</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>[]</td>
+      <td>[]</td>
+      <td>None</td>
+      <td>https://www.youtube.com/watch?v=Lk4zQ2wP-Nc</td>
+      <td>Lk4zQ2wP-Nc</td>
+      <td>https://www.space.com/3590-spacex-falcon-1-rocket-fails-reach-orbit.html</td>
+      <td>https://en.wikipedia.org/wiki/DemoSat</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>{'reused': False, 'recovery_attempt': False, 'recovered': False, 'ships': []}</td>
-      <td>{'patch': {'small': 'https://images2.imgbox.com/3d/86/cnu0pan8_o.png', 'large': 'https://images2.imgbox.com/4b/bd/d8UxLh4q_o.png'}, 'reddit': {'campaign': None, 'launch': None, 'media': None, 'recovery': None}, 'flickr': {'small': [], 'original': []}, 'presskit': None, 'webcast': 'https://www.youtube.com/watch?v=v0w9p3U8860', 'youtube_id': 'v0w9p3U8860', 'article': 'http://www.spacex.com/news/2013/02/11/falcon-1-flight-3-mission-summary', 'wikipedia': 'https://en.wikipedia.org/wiki/Trailblazer_(satellite)'}</td>
       <td>None</td>
       <td>NaN</td>
       <td>False</td>
@@ -381,11 +448,27 @@ data.head(5)
       <td>False</td>
       <td>[{'core': '5e9e289ef3591814873b2625', 'flight': 1, 'gridfins': False, 'legs': False, 'reused': False, 'landing_attempt': False, 'landing_success': None, 'landing_type': None, 'landpad': None}]</td>
       <td>5eb87cdbffd86e000604b32c</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>[]</td>
+      <td>https://images2.imgbox.com/3d/86/cnu0pan8_o.png</td>
+      <td>https://images2.imgbox.com/4b/bd/d8UxLh4q_o.png</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>[]</td>
+      <td>[]</td>
+      <td>None</td>
+      <td>https://www.youtube.com/watch?v=v0w9p3U8860</td>
+      <td>v0w9p3U8860</td>
+      <td>http://www.spacex.com/news/2013/02/11/falcon-1-flight-3-mission-summary</td>
+      <td>https://en.wikipedia.org/wiki/Trailblazer_(satellite)</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>{'reused': False, 'recovery_attempt': False, 'recovered': False, 'ships': []}</td>
-      <td>{'patch': {'small': 'https://images2.imgbox.com/e9/c9/T8CfiSYb_o.png', 'large': 'https://images2.imgbox.com/e0/a7/FNjvKlXW_o.png'}, 'reddit': {'campaign': None, 'launch': None, 'media': None, 'recovery': None}, 'flickr': {'small': [], 'original': []}, 'presskit': None, 'webcast': 'https://www.youtube.com/watch?v=dLQ2tZEH6G0', 'youtube_id': 'dLQ2tZEH6G0', 'article': 'https://en.wikipedia.org/wiki/Ratsat', 'wikipedia': 'https://en.wikipedia.org/wiki/Ratsat'}</td>
       <td>2008-09-20T00:00:00.000Z</td>
       <td>1.221869e+09</td>
       <td>False</td>
@@ -410,11 +493,27 @@ data.head(5)
       <td>False</td>
       <td>[{'core': '5e9e289ef3591855dc3b2626', 'flight': 1, 'gridfins': False, 'legs': False, 'reused': False, 'landing_attempt': False, 'landing_success': None, 'landing_type': None, 'landpad': None}]</td>
       <td>5eb87cdbffd86e000604b32d</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>[]</td>
+      <td>https://images2.imgbox.com/e9/c9/T8CfiSYb_o.png</td>
+      <td>https://images2.imgbox.com/e0/a7/FNjvKlXW_o.png</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>[]</td>
+      <td>[]</td>
+      <td>None</td>
+      <td>https://www.youtube.com/watch?v=dLQ2tZEH6G0</td>
+      <td>dLQ2tZEH6G0</td>
+      <td>https://en.wikipedia.org/wiki/Ratsat</td>
+      <td>https://en.wikipedia.org/wiki/Ratsat</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>{'reused': False, 'recovery_attempt': False, 'recovered': False, 'ships': []}</td>
-      <td>{'patch': {'small': 'https://images2.imgbox.com/a7/ba/NBZSw3Ho_o.png', 'large': 'https://images2.imgbox.com/8d/fc/0qdZMWWx_o.png'}, 'reddit': {'campaign': None, 'launch': None, 'media': None, 'recovery': None}, 'flickr': {'small': [], 'original': []}, 'presskit': 'http://www.spacex.com/press/2012/12/19/spacexs-falcon-1-successfully-delivers-razaksat-satellite-orbit', 'webcast': 'https://www.youtube.com/watch?v=yTaIDooc8Og', 'youtube_id': 'yTaIDooc8Og', 'article': 'http://www.spacex.com/news/2013/02/12/falcon-1-flight-5', 'wikipedia': 'https://en.wikipedia.org/wiki/RazakSAT'}</td>
       <td>None</td>
       <td>NaN</td>
       <td>False</td>
@@ -439,6 +538,24 @@ data.head(5)
       <td>False</td>
       <td>[{'core': '5e9e289ef359184f103b2627', 'flight': 1, 'gridfins': False, 'legs': False, 'reused': False, 'landing_attempt': False, 'landing_success': None, 'landing_type': None, 'landpad': None}]</td>
       <td>5eb87cdcffd86e000604b32e</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>[]</td>
+      <td>https://images2.imgbox.com/a7/ba/NBZSw3Ho_o.png</td>
+      <td>https://images2.imgbox.com/8d/fc/0qdZMWWx_o.png</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>[]</td>
+      <td>[]</td>
+      <td>http://www.spacex.com/press/2012/12/19/spacexs-falcon-1-successfully-delivers-razaksat-satellite-orbit</td>
+      <td>https://www.youtube.com/watch?v=yTaIDooc8Og</td>
+      <td>yTaIDooc8Og</td>
+      <td>http://www.spacex.com/news/2013/02/12/falcon-1-flight-5</td>
+      <td>https://en.wikipedia.org/wiki/RazakSAT</td>
+      <td>NaN</td>
     </tr>
   </tbody>
 </table>
